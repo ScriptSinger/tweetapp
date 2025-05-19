@@ -47,10 +47,7 @@ jobs:
         run: sleep 20
 
       - name: Install backend dependencies (Composer)
-        run: docker compose run --rm \
-          -e UID=${UID} \
-          -e GID=${GID} \
-          composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: docker compose run --rm -e UID=${UID} -e GID=${GID} composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run Laravel migrations
         run: docker compose exec -T php php artisan migrate --force
