@@ -91,6 +91,26 @@ services:
 
     # restart: always
     command: php artisan queue:work --verbose --tries=3 --timeout=90
+
+  reverb:
+    build:
+      context: ./php
+      dockerfile: php.dockerfile
+
+    volumes:
+      - ../backend:/var/www/html
+
+    depends_on:
+      mysql:
+        condition: service_healthy # Ожидаем, пока MySQL не станет здоровым
+
+    working_dir: /var/www/html
+    command:
+      ["php", "/var/www/html/artisan", "--port=8080", --debug, "reverb:start"]
+
+    ports:
+      - "8080:8080" # Прокидываем порт для WebSocket
+
 volumes:
   mysql_data:
   redis_data:

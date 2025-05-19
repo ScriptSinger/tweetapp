@@ -26,6 +26,7 @@ RUN docker-php-ext-install \
     mysqli \
     pdo_mysql \
     pdo \
+    pcntl \
     && docker-php-ext-enable mysqli pdo_mysql
 
 # Установка расширения Redis через PECL
