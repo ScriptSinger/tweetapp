@@ -1,11 +1,11 @@
 FROM php:8.2-fpm
 
 # Аргументы для UID/GID
-ARG WWWUSER=1000
-ARG WWWGROUP=1000
+ARG UID=1000
+ARG GID=1000
 
 # Логируем значения UID и GID
-RUN echo "📦 UID: ${WWWUSER}, GID: ${WWWGROUP}"
+RUN echo "📦 UID: ${UID}, GID: ${GID}"
 
 # Установка полезных утилит для отладки: ps, tree, curl
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -33,13 +33,13 @@ RUN docker-php-ext-install \
 RUN pecl install redis && docker-php-ext-enable redis   
 
 # Настройка PHP-FPM: меняем www-data → новый UID/GID
-RUN sed -i "s/^user = .*/user = ${WWWUSER}/" /usr/local/etc/php-fpm.d/www.conf && \
-    sed -i "s/^group = .*/group = ${WWWGROUP}/" /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i "s/^user = .*/user = ${UID}/" /usr/local/etc/php-fpm.d/www.conf && \
+    sed -i "s/^group = .*/group = ${GID}/" /usr/local/etc/php-fpm.d/www.conf
 
 
 # Создание группы и пользователя с нужными UID/GID (нужно для artisan)
-RUN groupadd -g ${WWWGROUP} phpuser && \
-    useradd -u ${WWWUSER} -g phpuser -s /bin/bash -m phpuser
+RUN groupadd -g ${GID} phpuser && \
+    useradd -u ${UID} -g phpuser -s /bin/bash -m phpuser
 
 
 USER phpuser

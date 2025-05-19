@@ -29,22 +29,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      - name: Export runner UID/GID
+        run: |
+          echo "UID=$(id -u)" >> $GITHUB_ENV
+          echo "GID=$(id -g)" >> $GITHUB_ENV
+
       - name: Build all containers
-        run: docker compose -f docker-compose.yaml build
+        run: |
+          docker compose build \
+            --build-arg UID=${UID} \
+            --build-arg GID=${GID}
 
       - name: Start all containers in background
-        run: docker compose -f docker-compose.yaml up -d
+        run: docker compose up -d
 
       - name: Wait for containers to initialize
         run: sleep 20
 
-      - name: Print UID/GID in runner
-        run: |
-          echo "UID: $(id -u)"
-          echo "GID: $(id -g)"
-
       - name: Install backend dependencies (Composer)
-        run: docker compose run --rm composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: docker compose run --rm \
+          -e UID=${UID} -e GID=${GID} \
+          composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run Laravel migrations
         run: docker compose exec -T php php artisan migrate --force
@@ -68,4 +73,5 @@ jobs:
 
       - name: Stop and remove containers
         if: always()
-        run: docker compose -f docker-compose.yaml down -v
+        run: docker compose down -v
+
