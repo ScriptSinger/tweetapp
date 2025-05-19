@@ -37,8 +37,8 @@ jobs:
       - name: Build all containers
         run: |
           docker compose build \
-            --build-arg UID=${env.UID} \
-            --build-arg GID=${env.GID}
+            --build-arg UID=$UID \
+            --build-arg GID=$GID
 
       - name: Start all containers in background
         run: docker compose up -d
@@ -47,7 +47,7 @@ jobs:
         run: sleep 20
 
       - name: Install backend dependencies (Composer)
-        run: docker compose run --rm -e UID=${env.UID} -e GID=${env.GID} composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: docker compose run --rm -e UID=$UID -e GID=$GID composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Run Laravel migrations
         run: docker compose exec -T php php artisan migrate --force
@@ -72,4 +72,3 @@ jobs:
       - name: Stop and remove containers
         if: always()
         run: docker compose down -v
-
