@@ -30,19 +30,19 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build all containers
-        run: docker-compose -f docker-compose.yaml build
+        run: docker compose -f docker compose.yaml build
 
       - name: Start all containers in background
-        run: docker-compose -f docker-compose.yaml up -d
+        run: docker compose -f docker compose.yaml up -d
 
       - name: Wait for containers to initialize
         run: sleep 20
 
       - name: Run Laravel migrations
-        run: docker-compose exec -T php php artisan migrate --force
+        run: docker compose exec -T php php artisan migrate --force
 
       - name: Run Laravel PHPUnit tests
-        run: docker-compose exec -T php ./vendor/bin/phpunit
+        run: docker compose exec -T php ./vendor/bin/phpunit
 
       - name: Install frontend dependencies
         working-directory: ../frontend
@@ -60,4 +60,4 @@ jobs:
 
       - name: Stop and remove containers
         if: always()
-        run: docker-compose -f docker-compose.yaml down -v
+        run: docker compose -f docker compose.yaml down -v
