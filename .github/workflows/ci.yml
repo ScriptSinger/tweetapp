@@ -38,6 +38,11 @@ jobs:
       - name: Wait for containers to initialize
         run: sleep 20
 
+      - name: Print UID/GID in runner
+        run: |
+          echo "UID: $(id -u)"
+          echo "GID: $(id -g)"
+
       - name: Install backend dependencies (Composer)
         run: docker compose run --rm composer install --no-interaction --prefer-dist --optimize-autoloader
 
