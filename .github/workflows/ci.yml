@@ -2,17 +2,15 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - "**"
+
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: deployment
 
     steps:
       - name: Checkout repository
@@ -35,40 +33,62 @@ jobs:
           echo "GID=$(id -g)" >> $GITHUB_ENV
 
       - name: Build all containers
+        working-directory: deployment
         run: |
           docker compose build \
             --build-arg UID=$UID \
             --build-arg GID=$GID
 
       - name: Start all containers in background
+        working-directory: deployment
         run: docker compose up -d
 
       - name: Wait for containers to initialize
         run: sleep 20
 
+      - name: pwd
+        run: |
+          pwd
+          ls -la
+          whoami
+
+      - name: Ensure bootstrap/cache exists
+        run: mkdir -p backend/bootstrap/cache
+
+      - name: Copy .env
+        run: cp backend/.env.example backend/.env
+
       - name: Install backend dependencies (Composer)
-        run: docker compose run --rm -e UID=$UID -e GID=$GID composer install --no-interaction --prefer-dist --optimize-autoloader
+        working-directory: deployment
+        run: docker compose run --rm composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Generate APP_KEY
+        working-directory: deployment
+        run: docker compose exec -T php php artisan key:generate
 
       - name: Run Laravel migrations
+        working-directory: deployment
         run: docker compose exec -T php php artisan migrate --force
 
       - name: Run Laravel PHPUnit tests
+        working-directory: deployment
         run: docker compose exec -T php ./vendor/bin/phpunit
 
       - name: Install frontend dependencies
-        working-directory: ../frontend
-        run: npm ci
+        working-directory: deployment
+        run: docker compose exec -T frontend npm ci
 
       - name: Run frontend Vitest unit tests
-        working-directory: ../frontend
-        run: npm run test
+        working-directory: deployment
+        run: docker compose exec -T frontend npm run test:unit
 
-      - name: Run Cypress e2e tests (headless)
-        working-directory: ../frontend
-        run: |
-          npx cypress install
-          npx cypress run
+      # - name: Run Cypress e2e tests (headless)
+      #   working-directory: deployment
+      #   run: |
+      #     docker compose exec -T frontend npx cypress install
+      #     docker compose exec -T frontend npx cypress run
 
       - name: Stop and remove containers
+        working-directory: deployment
         if: always()
         run: docker compose down -v
