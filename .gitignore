@@ -15,8 +15,8 @@ frontend/.vscode
 Thumbs.db
 
 # Docker
-deployment/.env
- 
+/deployment/.env
+
 deployment/frontend/.env
  
 *.log
