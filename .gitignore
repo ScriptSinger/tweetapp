@@ -1,23 +1,23 @@
 # Laravel
-/backend/vendor/
-/backend/storage/
-/backend/bootstrap/cache/
-/backend/.env
+backend/vendor/
+backend/storage/
+backend/bootstrap/cache/
+backend/.env
 
 # Node
-/frontend/node_modules/
-/frontend/dist/
-/frontend/.env
-/frontend/.vscode
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.vscode
 
 # System
 .DS_Store
 Thumbs.db
 
 # Docker
-/deployment/php/.env
+deployment/php/.env
  
-/deployment/frontend/.env
+deployment/frontend/.env
  
 *.log
 
@@ -26,4 +26,4 @@ Thumbs.db
 .idea/
 
 # Tests
-/frontend/coverage/
+frontend/coverage/
