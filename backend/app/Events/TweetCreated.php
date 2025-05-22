@@ -5,8 +5,6 @@ namespace App\Events;
 use App\Models\Tweet;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -15,10 +13,6 @@ class TweetCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
-
     public $tweet;
 
     public function __construct(Tweet $tweet)
@@ -26,11 +20,6 @@ class TweetCreated implements ShouldBroadcast
         $this->tweet = $tweet;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): Channel
     {
 
@@ -47,7 +36,7 @@ class TweetCreated implements ShouldBroadcast
                 'id' => $this->tweet->category->id,
                 'title' => $this->tweet->category->title,
             ],
-            'created_at' => $this->tweet->created_at
+            'created_at' => $this->tweet->created_at,
         ];
     }
 }

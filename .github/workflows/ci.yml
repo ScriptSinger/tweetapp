@@ -74,6 +74,12 @@ jobs:
         working-directory: deployment
         run: docker compose exec -T php ./vendor/bin/phpunit
 
+      - name: PHP Lint & Static Analysis
+        working-directory: deployment
+        run: |
+          docker compose exec -T php ./vendor/bin/pint --test
+          docker compose exec -T php ./vendor/bin/phpstan analyse --memory-limit=512M
+
       - name: Install frontend dependencies
         working-directory: deployment
         run: docker compose exec -T frontend npm ci

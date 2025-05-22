@@ -20,16 +20,14 @@ Route::get('/test-redis', function () {
 
         return $value; // Выведет 'Laravel Redis is working!'
     } catch (\Exception $e) {
-        return 'Error connecting to Redis: ' . $e->getMessage();
+        return 'Error connecting to Redis: '.$e->getMessage();
     }
 });
-
-
 
 Route::get('/test-broadcast', function () {
     $tweet = Tweet::find(1); // Замените 1 на ID существующего твита
 
-    if (!$tweet) {
+    if (! $tweet) {
         return response('Tweet not found', 404);
     }
 

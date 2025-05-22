@@ -24,13 +24,11 @@ class CreateTweetJob implements ShouldQueue
     public function handle(): void
     {
         $tweet = Tweet::create([
-            'username'    => $this->data['username'],
-            'content'     => $this->data['content'],
+            'username' => $this->data['username'],
+            'content' => $this->data['content'],
             'category_id' => $this->data['category_id'],
 
         ]);
-
-
 
         broadcast(new TweetCreated($tweet));
     }
