@@ -15,7 +15,7 @@ frontend/.vscode
 Thumbs.db
 
 # Docker
-deployment/php/.env
+deployment/.env
  
 deployment/frontend/.env
  
