@@ -23,12 +23,12 @@ class StoreTweetRequest extends FormRequest
     {
         return [
             'category_id' => ['required', 'exists:categories,id'],
-            'username' =>  [
+            'username' => [
                 'required',
                 'string',
                 'alpha_num',      // Только буквы и цифры (можно заменить на 'regex', если нужен другой формат)
                 'min:3',
-                'max:30'
+                'max:30',
             ],
             'content' => ['required', 'string', 'max:280'],
         ];
