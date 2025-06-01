@@ -1,0 +1,46 @@
+name: 🛠️ Build Stage
+
+on:
+  push:
+    branches:
+      - pipeline
+  workflow_dispatch:
+
+env:
+  DB_DATABASE: ${{ secrets.DB_DATABASE }}
+  DB_USERNAME: ${{ secrets.DB_USERNAME }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+jobs:
+  build:
+    name: 📦 Laravel Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout репозитория
+        uses: actions/checkout@v4
+
+      - name: 📝 Создать .env и записать секреты
+        working-directory: backend
+        run: |
+          cp .env.example .env
+          echo "DB_DATABASE=${DB_DATABASE}" >> .env
+          echo "DB_USERNAME=${DB_USERNAME}" >> .env
+          echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
+
+      - name: 🚀 Билд Laravel в контейнере
+        working-directory: deployment
+        run: |
+          docker compose up -d
+          docker compose exec composer composer install --no-dev --optimize-autoloader
+          docker compose exec composer php artisan config:cache
+          docker compose exec composer php artisan route:cache
+          docker compose exec composer php artisan view:cache
+
+      - name: 💾 Загрузка артефактов в GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: laravel-build-artifacts
+          path: |
+            backend/vendor/
+            backend/bootstrap/cache/
