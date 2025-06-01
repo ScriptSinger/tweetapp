@@ -31,11 +31,11 @@ jobs:
       - name: 🚀 Билд Laravel в контейнере
         working-directory: deployment
         run: |
-          docker compose up -d
-          docker compose exec composer composer install --no-dev --optimize-autoloader
-          docker compose exec composer php artisan config:cache
-          docker compose exec composer php artisan route:cache
-          docker compose exec composer php artisan view:cache
+          docker compose up -d --build
+          docker compose run --rm composer composer install --no-dev --optimize-autoloader
+          docker compose run --rm composer php artisan config:cache
+          docker compose run --rm composer php artisan route:cache
+          docker compose run --rm composer php artisan view:cache
 
       - name: 💾 Загрузка артефактов в GitHub
         uses: actions/upload-artifact@v4
