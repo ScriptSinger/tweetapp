@@ -28,10 +28,22 @@ jobs:
           echo "DB_USERNAME=${DB_USERNAME}" >> .env
           echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
 
+      - name: 🧑‍💻 Export runner UID/GID
+        run: |
+          echo "UID=$(id -u)" >> $GITHUB_ENV
+          echo "GID=$(id -g)" >> $GITHUB_ENV
+
+      - name: 🔧 Build all containers
+        working-directory: deployment
+        run: |
+          docker compose build \
+            --build-arg UID=$UID \
+            --build-arg GID=$GID
+
       - name: 🚀 Билд Laravel в контейнере
         working-directory: deployment
         run: |
-          docker compose up -d --build
+          docker compose up -d 
           docker compose run --rm composer composer install --no-dev --optimize-autoloader
           docker compose run --rm composer php artisan config:cache
           docker compose run --rm composer php artisan route:cache
