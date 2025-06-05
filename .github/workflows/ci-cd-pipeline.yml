@@ -1,4 +1,4 @@
-name: 🛠️ Build Stage
+name: 🛠️ Stages
 
 on:
   push:
@@ -12,9 +12,13 @@ env:
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
 jobs:
-  build:
-    name: 📦 Laravel Build
+  init:
+    name: 🧱 Init / Setup
     runs-on: ubuntu-latest
+
+    outputs:
+      uid: ${{ steps.export-uid.outputs.uid }}
+      gid: ${{ steps.export-uid.outputs.gid }}
 
     steps:
       - name: 📥 Checkout репозитория
@@ -29,9 +33,34 @@ jobs:
           echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
 
       - name: 🧑‍💻 Export runner UID/GID
+        id: export-uid
         run: |
-          echo "UID=$(id -u)" >> $GITHUB_ENV
-          echo "GID=$(id -g)" >> $GITHUB_ENV
+          echo "uid=$(id -u)" >> $GITHUB_OUTPUT
+          echo "gid=$(id -g)" >> $GITHUB_OUTPUT
+
+      - name: 💾 Сохранить рабочее дерево как артефакт
+        uses: actions/upload-artifact@v4
+        with:
+          name: source
+          path: |
+            backend/
+            deployment/
+
+  build:
+    name: 📦 Laravel Build
+    runs-on: ubuntu-latest
+    needs: init
+
+    env:
+      UID: ${{ needs.init.outputs.uid }}
+      GID: ${{ needs.init.outputs.gid }}
+
+    steps:
+      - name: 📥 Скачать исходники
+        uses: actions/download-artifact@v4
+        with:
+          name: source
+          path: ./
 
       - name: 🔧 Build all containers
         working-directory: deployment
@@ -43,13 +72,13 @@ jobs:
       - name: 🚀 Билд Laravel в контейнере
         working-directory: deployment
         run: |
-          docker compose up -d 
+          docker compose up -d
           docker compose run --rm composer composer install --no-dev --optimize-autoloader
           docker compose run --rm composer php artisan config:cache
           docker compose run --rm composer php artisan route:cache
           docker compose run --rm composer php artisan view:cache
 
-      - name: 💾 Загрузка артефактов в GitHub
+      - name: 💾 Загрузка артефактов Laravel
         uses: actions/upload-artifact@v4
         with:
           name: laravel-build-artifacts
