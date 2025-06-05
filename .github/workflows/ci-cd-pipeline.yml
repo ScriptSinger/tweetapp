@@ -70,6 +70,9 @@ jobs:
             --build-arg UID=$UID \
             --build-arg GID=$GID
 
+      - name: Ensure bootstrap/cache exists
+        run: mkdir -p ../backend/bootstrap/cache
+
       - name: 🚀 Билд Laravel в контейнере
         working-directory: deployment
         run: |
