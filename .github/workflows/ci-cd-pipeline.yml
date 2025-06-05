@@ -45,6 +45,7 @@ jobs:
           path: |
             backend/
             deployment/
+            frontend/
 
   build:
     name: 📦 Laravel Build
