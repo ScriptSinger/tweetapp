@@ -74,7 +74,9 @@ jobs:
         working-directory: deployment
         run: |
           docker compose up -d
+
           docker compose run --rm composer sh -c "mkdir -p bootstrap/cache && chown -R $UID:$GID bootstrap/cache && chmod -R 775 bootstrap/cache"
+          docker compose run --rm composer sh -c "mkdir -p resources/views"
 
           docker compose run --rm composer composer install --no-dev --optimize-autoloader
           docker compose run --rm composer php artisan config:cache
