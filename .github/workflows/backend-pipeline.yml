@@ -3,7 +3,7 @@ name: Backend
 on:
   push:
     branches:
-      - pipeline
+      - feature/backend/ci
   workflow_dispatch:
 
 env:
