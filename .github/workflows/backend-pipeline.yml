@@ -20,6 +20,9 @@ jobs:
       - name: 📥 Checkout репозитория
         uses: actions/checkout@v4
 
+      - name: 🔐 Docker Login to GHCR
+        run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
       - name: 📝 Создать .env и записать секреты
         working-directory: backend
         run: |
@@ -48,16 +51,3 @@ jobs:
           docker compose run --rm composer php artisan config:cache
           docker compose run --rm composer php artisan route:cache
           docker compose run --rm composer php artisan view:cache
-
-  docker-login:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Docker Login to GHCR
-        run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-
-      - name: Проверка успешного входа
-        run: docker info | grep -i 'Username' || (echo "❌ Логин не выполнен" && exit 1)
