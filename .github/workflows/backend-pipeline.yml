@@ -1,4 +1,4 @@
-name: 🛠️ Build Stage
+name: Backend
 
 on:
   push:
@@ -33,26 +33,31 @@ jobs:
           echo "UID=$(id -u)" >> $GITHUB_ENV
           echo "GID=$(id -g)" >> $GITHUB_ENV
 
-      - name: 🔧 Build all containers
+      - name: 🔧 Сборка Docker-контейнеров
         working-directory: deployment
         run: |
           docker compose build \
             --build-arg UID=$UID \
             --build-arg GID=$GID
 
-      - name: 🚀 Билд Laravel в контейнере
+      - name: 🚀 Laravel build внутри контейнера
         working-directory: deployment
         run: |
-          docker compose up -d 
+          docker compose up -d
           docker compose run --rm composer composer install --no-dev --optimize-autoloader
           docker compose run --rm composer php artisan config:cache
           docker compose run --rm composer php artisan route:cache
           docker compose run --rm composer php artisan view:cache
 
-      - name: 💾 Загрузка артефактов в GitHub
-        uses: actions/upload-artifact@v4
-        with:
-          name: laravel-build-artifacts
-          path: |
-            backend/vendor/
-            backend/bootstrap/cache/
+  docker-login:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Docker Login to GHCR
+        run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Проверка успешного входа
+        run: docker info | grep -i 'Username' || (echo "❌ Логин не выполнен" && exit 1)
