@@ -59,10 +59,10 @@ jobs:
         working-directory: deployment
         run: |
           OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          PHP_IMAGE="ghcr.io/${OWNER_LC}/tweet-queue-php"
+          PHP_IMAGE="ghcr.io/${OWNER_LC}/deployment-php"
 
-          docker tag tweet-queue-php $PHP_IMAGE:latest
-          docker tag tweet-queue-php $PHP_IMAGE:${{ github.sha }}
+          docker tag deployment-php $PHP_IMAGE:latest
+          docker tag deployment-php $PHP_IMAGE:${{ github.sha }}
 
           docker push $PHP_IMAGE:latest
           docker push $PHP_IMAGE:${{ github.sha }}
