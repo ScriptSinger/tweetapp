@@ -54,10 +54,12 @@ jobs:
 
       - name: 📦 Публикация PHP-образа в GHCR
         working-directory: deployment
-        env:
-          PHP_IMAGE: ghcr.io/${{ github.repository_owner }}/tweet-queue-php
         run: |
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          PHP_IMAGE="ghcr.io/${OWNER_LC}/tweet-queue-php"
+
           docker tag tweet-queue-php $PHP_IMAGE:latest
           docker tag tweet-queue-php $PHP_IMAGE:${{ github.sha }}
+
           docker push $PHP_IMAGE:latest
           docker push $PHP_IMAGE:${{ github.sha }}
