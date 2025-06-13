@@ -66,3 +66,23 @@ jobs:
 
           docker push $PHP_IMAGE:latest
           docker push $PHP_IMAGE:${{ github.sha }}
+
+  deployment:
+    name: Laravel Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH and test connection
+        run: |
+          echo "🔐 Настройка SSH ключа..."
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          echo "📥 Добавление удалённого хоста в known_hosts..."
+          ssh-keyscan -H "${{ secrets.REMOTE_HOST }}" >> ~/.ssh/known_hosts
+
+          echo "🚀 Проверка подключения к ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}"
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 \
+              ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
+              "echo '✅ SSH соединение установлено'"

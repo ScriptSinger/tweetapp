@@ -24,3 +24,4 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 \
               ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} \
               "echo '✅ SSH соединение установлено'"
+              
